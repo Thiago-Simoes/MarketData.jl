@@ -92,7 +92,7 @@ julia> yahoo(:AAPL, YahooOpt(period1 = start))
 function yahoo(sym::AbstractString = "^GSPC", opt::YahooOpt = YahooOpt())
     host = rand(["query1", "query2"])
     url  = "https://$host.finance.yahoo.com/v8/finance/chart/$sym"
-    res  = HTTP.get(url, query = opt)
+    res  = HTTP.get(url, query = opt, require_ssl_verification=false)
     @assert res.status == 200
 
     json_arr = JSON3.read(res.body)
@@ -138,7 +138,7 @@ https://research.stlouisfed.org/fred2
 """
 function fred(data::AbstractString="CPIAUCNS")
     url = "http://research.stlouisfed.org/fred2/series/$data/downloaddata/$data.csv"
-    res = HTTP.get(url)
+    res = HTTP.get(url, require_ssl_verification=false)
     @assert res.status == 200
     csv = CSV.File(res.body, missingstring = ".")
     sch = TimeSeries.Tables.schema(csv)
@@ -177,7 +177,7 @@ https://www.ons.gov.uk/timeseriestool
 """
 function ons(timeseries::AbstractString = "L522", dataset::AbstractString = "MM23")
     url = "https://api.ons.gov.uk/dataset/$dataset/timeseries/$timeseries/data"
-    res = HTTP.get(url)
+    res = HTTP.get(url, require_ssl_verification=false)
     @assert res.status == 200
     json = JSON3.read(HTTP.payload(res))
     ta = nothing
